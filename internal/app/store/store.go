@@ -7,9 +7,9 @@ import (
 )
 
 type Store struct {
-	config         *Config
-	db             *sql.DB
-	userRepository *UserRepository
+	config            *Config
+	db                *sql.DB
+	profileRepository *ProfileRepository
 }
 
 func New(config *Config) *Store {
@@ -37,14 +37,14 @@ func (s *Store) Close() {
 	s.db.Close()
 }
 
-func (s *Store) User() *UserRepository {
-	if s.userRepository != nil {
-		return s.userRepository
+func (s *Store) Profile() *ProfileRepository {
+	if s.profileRepository != nil {
+		return s.profileRepository
 	}
 
-	s.userRepository = &UserRepository{
+	s.profileRepository = &ProfileRepository{
 		store: s,
 	}
 
-	return s.userRepository
+	return s.profileRepository
 }
