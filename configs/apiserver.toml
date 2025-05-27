@@ -1,6 +1,7 @@
 #bind_addr = "192.168.1.221:8080"
-bind_addr = "127.0.0.1:8081"
-log_level = "debug"
+bind_addr = "${BIND_ADDR}"
+log_level = "${LOG_LEVEL}"
 
 [store]
-database_url = "host=localhost port=5432 user=fek password=1234 dbname=profiles"
+database_url = "host=${DB_URL} port=${DB_PORT} user=${DB_USER} password=${DB_PASSWORD} dbname=${DB_NAME} sslmode=disable"
+

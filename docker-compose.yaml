@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_profiles
+    environment:
+      POSTGRES_USER: ${DB_USER} 
+      POSTGRES_PASSWORD: ${DB_PASSWORD} 
+      POSTGRES_DB: ${DB_NAME} 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - my-app-network
+
+  flyway:
+    image: flyway/flyway:9-alpine
+    container_name: flyway_profiles
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/flyway/sql  # Папка с миграциями
+    environment:
+      FLYWAY_URL: jdbc:postgresql://${DB_URL}:5432/${DB_NAME}
+      FLYWAY_USER: ${DB_USER} 
+      FLYWAY_PASSWORD: ${DB_PASSWORD} 
+      FLYWAY_BASELINE_ON_MIGRATE: "true"
+    command: migrate
+    networks:
+      - my-app-network
+
+  profiles_service:
+    image: fekk/profiles_service
+    container_name: profiles_service
+    expose:
+      - "8081"
+    depends_on:
+      flyway:
+        condition: service_completed_successfully
+    networks:
+      - my-app-network
+    volumes:
+      - ./.env:/app/.env
+
+networks:
+  my-app-network:
+    external: true
+    name: my-app-network
+
+volumes:
+  postgres_data:

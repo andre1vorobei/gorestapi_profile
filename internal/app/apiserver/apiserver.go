@@ -98,15 +98,18 @@ func (s *APIServer) Start() error {
 		//Certificates: []tls.Certificate{ownCert},
 	}
 
+	fmt.Println(tlsConfig)
+
 	server := &http.Server{
-		Addr:      s.config.BindAddr,
-		Handler:   corsMiddleware.Handler(s.router),
-		TLSConfig: tlsConfig,
+		Addr:    s.config.BindAddr,
+		Handler: corsMiddleware.Handler(s.router),
+		//	TLSConfig: tlsConfig,
 	}
 
 	s.logger.Info("starting api server")
 
-	return server.ListenAndServeTLS("certs/profiles.crt", "certs/profiles.key")
+	//	return server.ListenAndServeTLS("certs/profiles.crt", "certs/profiles.key")
+	return server.ListenAndServe()
 }
 
 func (s *APIServer) configureRouter() {
